@@ -1,0 +1,414 @@
+/* Values pulled from Figma: Portfolio-WIP › Desktop - 6 (node 26:521) */
+
+:root {
+  --color-paper: #fffbf5;
+  --color-card: #f7f1ef;
+  --color-ink: #000;
+  --color-inverse: #fff;
+  --color-body: #424040;
+  --color-accent: #f3787a;
+
+  --font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-arial: Arial, "Helvetica Neue", Helvetica, sans-serif;
+
+  --content-width: 1042px;
+  --work-width: 862px;
+  --gutter: 40px;
+
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-slow: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, p, ol {
+  margin: 0;
+  padding: 0;
+  font-weight: 400;
+}
+
+ol {
+  list-style: none;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+a:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 4px;
+  border-radius: 2px;
+}
+
+img {
+  max-width: 100%;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.container {
+  width: min(var(--content-width), 100% - var(--gutter) * 2);
+  margin-inline: auto;
+}
+
+/* ---------- Masthead (header + hero) ---------- */
+
+.masthead {
+  background: var(--color-ink);
+  color: var(--color-inverse);
+  padding: 77px 0 157px;
+}
+
+.site-nav {
+  display: flex;
+  align-items: center;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Morphs into an organic blob on hover — driven by main.js. The box is 36px
+   (pulled back to a 24px footprint) so the blob has room to bulge past the
+   24px circle without being cropped. */
+.brand-dot {
+  display: block;
+  flex: none;
+  width: 36px;
+  height: 36px;
+  margin: -6px;
+  background: var(--color-accent);
+  clip-path: circle(12px at 50% 50%);
+}
+
+.hero {
+  margin-top: 228px;
+}
+
+.hero-title {
+  max-width: 495px;
+  font-size: 24px;
+  font-weight: 500;
+}
+
+.hero-body {
+  max-width: 597px;
+  margin-top: 32px;
+  line-height: 22px;
+}
+
+/* Slow blur-to-focus intro: title and body arrive together at 300ms */
+.hero-title,
+.hero-body {
+  animation: focus-in 2.8s var(--ease-slow) 300ms both;
+}
+
+@keyframes focus-in {
+  from {
+    opacity: 0;
+    filter: blur(28px);
+    transform: translateY(12px) scale(1.02);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: none;
+  }
+}
+
+/* ---------- Paper section ---------- */
+
+.paper {
+  padding: 72px 0 149px;
+}
+
+.section-label {
+  font-size: 16px;
+}
+
+/* ---------- How I Work ---------- */
+
+.how-i-work {
+  width: min(var(--work-width), 100% - var(--gutter) * 2);
+  margin-inline: auto;
+}
+
+.work-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 22px;
+  row-gap: 32px;
+  /* 28px label gap + 14px offset from the (invisible) divider above row one */
+  margin-top: 42px;
+}
+
+.work-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.work-title {
+  font-size: 24px;
+  font-weight: 500;
+  letter-spacing: -0.72px;
+}
+
+.work-desc {
+  color: var(--color-body);
+  font-size: 14px;
+  line-height: 20px;
+}
+
+/* Scroll reveal — cards sharing a row cross the threshold together */
+.js .reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  filter: blur(4px);
+  transition:
+    opacity 0.9s var(--ease-out),
+    transform 0.9s var(--ease-out),
+    filter 0.9s var(--ease-out);
+}
+
+.js .reveal.is-visible {
+  opacity: 1;
+  transform: none;
+  filter: blur(0);
+}
+
+/* ---------- Experience ---------- */
+
+.experience {
+  margin-top: 130px;
+}
+
+.job-list {
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+  margin-top: 22px;
+}
+
+.job {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.divider {
+  display: block;
+  width: 100%;
+  height: 1px;
+}
+
+.job-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.job-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.job-company {
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: -0.36px;
+}
+
+.job-role {
+  font-size: 16px;
+}
+
+.job-desc {
+  flex: 0 0 377px;
+  color: var(--color-body);
+  font-size: 14px;
+}
+
+/* ---------- Select works ---------- */
+
+.select-works {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 9px;
+  width: min(1027px, 100% - var(--gutter) * 2);
+  margin: 142px auto 0;
+  padding: 40px 24px;
+  border-radius: 16px;
+  background: var(--color-card);
+  text-align: center;
+}
+
+.works-title {
+  font-size: 30px;
+  font-weight: 500;
+  letter-spacing: -0.6px;
+}
+
+.works-status {
+  font-family: var(--font-arial);
+  font-size: 16px;
+  letter-spacing: -0.32px;
+}
+
+/* ---------- Footer ---------- */
+
+.site-footer {
+  padding: 18px 0;
+}
+
+.site-footer a {
+  transition: opacity 0.2s ease;
+}
+
+.site-footer a:hover {
+  opacity: 0.6;
+}
+
+.footer-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 24px;
+}
+
+.footer-email {
+  text-decoration: underline;
+  text-underline-position: from-font;
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 900px) {
+  .job-desc {
+    flex-basis: 45%;
+  }
+}
+
+@media (max-width: 720px) {
+  :root {
+    --gutter: 24px;
+  }
+
+  .masthead {
+    padding: 32px 0 120px;
+  }
+
+  .hero {
+    margin-top: 120px;
+  }
+
+  .paper {
+    padding: 72px 0 72px;
+  }
+
+  .work-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .experience {
+    margin-top: 96px;
+  }
+
+  .job-list {
+    gap: 36px;
+  }
+
+  .job-row {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .job-desc {
+    flex-basis: auto;
+  }
+
+  .select-works {
+    margin-top: 96px;
+  }
+
+  .site-footer {
+    padding: 14px 0;
+    font-size: 14px;
+  }
+
+  .footer-row,
+  .footer-links {
+    gap: 12px;
+  }
+
+  .footer-links {
+    flex-wrap: nowrap;
+  }
+}
+
+@media (max-width: 359px) {
+  .footer-links {
+    flex-wrap: wrap;
+    gap: 4px 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .hero-title,
+  .hero-body {
+    animation: none;
+  }
+
+  .js .reveal {
+    opacity: 1;
+    transform: none;
+    filter: none;
+    transition: none;
+  }
+}
