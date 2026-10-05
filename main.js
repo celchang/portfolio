@@ -3,11 +3,10 @@ document.getElementById('year').textContent = new Date().getFullYear();
 
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
-// Scroll reveals for How I Work cards and Experience entries. Elements animate
-// in one line at a time: anything entering together is staggered top to
-// bottom, while items sharing a line (the two cards in a How I Work row) move
-// as one. Nothing reveals until the user first scrolls down, even if a
-// section is already on screen at load.
+// Scroll reveals for the Experience entries. Elements animate in one line at a
+// time: anything entering together is staggered top to bottom, while items
+// sharing a line move as one. Nothing reveals until the user first scrolls
+// down, even if a section is already on screen at load.
 const revealTargets = document.querySelectorAll('.reveal');
 const STAGGER_MS = 140;
 
