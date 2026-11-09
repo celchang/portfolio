@@ -1,0 +1,111 @@
+/* Skyspace: the aperture, the light it spills into the room, clouds, grain.
+   The values here are the no-JS fallback — a cream room and a midday sky,
+   which is a finished design on its own. render.js overwrites them. */
+
+:root {
+  --room: #fffbf5;
+  --ink: #111111;
+  --glow: #ebf4fa;
+  --sky-top: #7fbbe0;
+  --sky-bot: #d4e6f3;
+  --cloud: #ffffff;
+  --spill: 0.55;
+  --dot: #f3787a;
+
+  /* Aperture box, as a share of the page — from the Figma frame:
+     479 × 637 at (761, 84) in a 1440 × 828 frame. */
+  --ap-x: 52.85%;
+  --ap-y: 10.15%;
+  --ap-w: 33.26%;
+  --ap-h: 76.95%;
+
+  --sky-fade: 1.2s;
+}
+
+/* The light from the aperture falling on the page. */
+.sky-spill {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: var(--spill);
+  transition: opacity 0.8s linear;
+}
+
+.sky-spill::before {
+  content: "";
+  position: absolute;
+  left: var(--ap-x);
+  top: var(--ap-y);
+  width: var(--ap-w);
+  height: var(--ap-h);
+  background: var(--glow);
+  transform: scale(1.55);
+  filter: blur(70px);
+  transition: background-color var(--sky-fade) linear;
+}
+
+/* The opening itself: a knife-edge rectangle, no frame, no shadow. */
+.sky-aperture {
+  position: absolute;
+  left: var(--ap-x);
+  top: var(--ap-y);
+  width: var(--ap-w);
+  height: var(--ap-h);
+  z-index: 2;
+  overflow: hidden;
+  background: linear-gradient(180deg, var(--sky-top), var(--sky-bot));
+  transition: background var(--sky-fade) linear;
+}
+
+.sky-cloud {
+  position: absolute;
+  inset: -30%;
+  background: var(--cloud);
+  opacity: 0;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  pointer-events: none;
+  will-change: transform;
+  transition: opacity var(--sky-fade) linear, background-color var(--sky-fade) linear;
+}
+
+.sky-cloud.is-big {
+  filter: blur(5px);
+}
+
+.sky-grain {
+  position: absolute;
+  inset: 0;
+  opacity: 0.22;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sky-spill,
+  .sky-aperture,
+  .sky-cloud {
+    transition: none;
+  }
+}
+
+/* Phase 4 refines the phone layout; this keeps it sound in the meantime.
+   The aperture joins the flow, and the spill keeps roughly its box. */
+@media (max-width: 820px) {
+  :root {
+    --ap-x: 0%;
+    --ap-y: 9%;
+    --ap-w: 100%;
+    --ap-h: 42%;
+  }
+
+  .sky-aperture {
+    position: relative;
+    left: auto;
+    top: auto;
+    width: 100%;
+    height: min(46vh, 420px);
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "version": "1.1",
+  "stops": [
+    { "name": "Deep night", "e": -18, "top": "#0a0f2a", "bot": "#1d274e", "room": "#141318", "glow": "#343f74" },
+    { "name": "Night", "e": -12, "top": "#0f1846", "bot": "#3a406e", "room": "#2d2833", "glow": "#525498" },
+    { "name": "Blue hour", "e": -7, "top": "#1d2c78", "bot": "#535688", "room": "#e8d2cf", "glow": "#8a7fb8" },
+    { "name": "Civil twilight", "e": -3, "top": "#243c89", "bot": "#8873b0", "room": "#f3dcd2", "glow": "#e2a6b8" },
+    { "name": "Sunset / sunrise", "e": 0, "top": "#325395", "bot": "#ec9e74", "room": "#f8e4d6", "glow": "#f4b49c" },
+    { "name": "Golden hour", "e": 5, "top": "#5571c3", "bot": "#8ab8db", "room": "#fbefe2", "glow": "#f6cfa2" },
+    { "name": "Day", "e": 15, "top": "#80b5de", "bot": "#cfe1f0", "room": "#fcf6ec", "glow": "#eee6d6" },
+    { "name": "High sun", "e": 40, "top": "#7fbbe0", "bot": "#d4e6f3", "room": "#fdfaf3", "glow": "#ebf4fa" }
+  ],
+  "weather": {
+    "clear": { "desat": 0.05, "shade": 0, "cloud": 0, "size": 1.8, "texture": 0.4 },
+    "partly": { "desat": 0.15, "shade": 0.1, "cloud": 0.79, "size": 4, "texture": 0.07 },
+    "overcast": { "desat": 0.72, "shade": 0.04, "cloud": 0.9, "size": 3.6, "texture": 0.12 },
+    "rain": { "desat": 0.59, "shade": 0.16, "cloud": 0.95, "size": 3.2, "texture": 0.18 }
+  },
+  "neutral": { "day": "#c8cdd4", "night": "#4e3e4a" },
+  "ink": { "dark": "#111111", "light": "#efe9df", "flipBelowLuminance": 0.25 }
+}

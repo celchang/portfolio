@@ -3,59 +3,6 @@ document.getElementById('year').textContent = new Date().getFullYear();
 
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
-// Scroll reveals for the Experience entries. Elements animate in one line at a
-// time: anything entering together is staggered top to bottom, while items
-// sharing a line move as one. Nothing reveals until the user first scrolls
-// down, even if a section is already on screen at load.
-const revealTargets = document.querySelectorAll('.reveal');
-const STAGGER_MS = 140;
-
-function startReveal() {
-  if (!('IntersectionObserver' in window)) {
-    revealTargets.forEach((el) => el.classList.add('is-visible'));
-    return;
-  }
-
-  const observer = new IntersectionObserver(
-    (entries) => {
-      const entering = entries
-        .filter((entry) => entry.isIntersecting)
-        .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
-
-      let line = -1;
-      let lineTop = null;
-
-      entering.forEach((entry) => {
-        const top = Math.round(entry.boundingClientRect.top);
-        if (top !== lineTop) {
-          line += 1;
-          lineTop = top;
-        }
-        entry.target.style.transitionDelay = `${line * STAGGER_MS}ms`;
-        entry.target.classList.add('is-visible');
-        observer.unobserve(entry.target);
-      });
-    },
-    { threshold: 0.15, rootMargin: '0px 0px -8% 0px' }
-  );
-
-  revealTargets.forEach((el) => observer.observe(el));
-}
-
-const startY = window.scrollY;
-
-if (startY > 0) {
-  // Page restored mid-scroll (reload, back navigation) — reveal normally.
-  startReveal();
-} else {
-  const onFirstScroll = () => {
-    if (window.scrollY <= startY) return;
-    window.removeEventListener('scroll', onFirstScroll);
-    startReveal();
-  };
-  window.addEventListener('scroll', onFirstScroll, { passive: true });
-}
-
 // Easter egg: hovering the name turns the dot into a shifting organic blob.
 // The outline is a circle whose radius is nudged by several drifting sine
 // waves (2–5 lobes each), traced as a clip-path polygon. Leaving eases it back

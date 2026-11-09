@@ -1,21 +1,15 @@
-/* Values pulled from Figma: Portfolio-WIP › Desktop - 6 (node 26:521) */
+/* Page layout and type. Proportions come from the Figma homepage frame
+   (Portfolio WIP › Desktop - 9, node 102:1979), a 1440 × 828 frame.
+   The aperture, glow, clouds and grain live in assets/skyspace/skyspace.css. */
 
 :root {
-  --color-paper: #fffbf5;
-  --color-card: #f7f1ef;
-  --color-ink: #000;
-  --color-inverse: #fff;
-  --color-body: #424040;
-  --color-accent: #f3787a;
-
   --font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  --font-arial: Arial, "Helvetica Neue", Helvetica, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, monospace;
 
-  --content-width: 1042px;
-  --gutter: 40px;
-
-  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
-  --ease-slow: cubic-bezier(0.16, 1, 0.3, 1);
+  /* Figma: header and footer gutters, and the text column at x=199. */
+  --edge: 5.56%;
+  --copy-x: 13.82%;
+  --copy-w: 420px;
 }
 
 *,
@@ -25,29 +19,30 @@
 }
 
 html {
-  scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;
+}
+
+html,
+body {
+  height: 100%;
 }
 
 body {
   margin: 0;
-  background: var(--color-paper);
-  color: var(--color-ink);
+  background: var(--room);
+  color: var(--ink);
   font-family: var(--font-sans);
-  font-size: 16px;
+  font-size: 14px;
   line-height: normal;
+  overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background-color var(--sky-fade) linear, color var(--sky-fade) linear;
 }
 
-h1, h2, h3, p, ol {
+h1, p {
   margin: 0;
-  padding: 0;
   font-weight: 400;
-}
-
-ol {
-  list-style: none;
 }
 
 a {
@@ -61,10 +56,6 @@ a:focus-visible {
   border-radius: 2px;
 }
 
-img {
-  max-width: 100%;
-}
-
 .visually-hidden {
   position: absolute;
   width: 1px;
@@ -74,22 +65,21 @@ img {
   white-space: nowrap;
 }
 
-.container {
-  width: min(var(--content-width), 100% - var(--gutter) * 2);
-  margin-inline: auto;
+.page {
+  position: relative;
+  height: 100vh;
+  min-height: 760px;
+  width: 100%;
+  overflow: hidden;
 }
 
-/* ---------- Masthead (header + hero) ---------- */
-
-.masthead {
-  background: var(--color-ink);
-  color: var(--color-inverse);
-  padding: 77px 0 157px;
-}
+/* ---------- Header ---------- */
 
 .site-nav {
-  display: flex;
-  align-items: center;
+  position: absolute;
+  top: 23px;
+  left: var(--edge);
+  z-index: 3;
 }
 
 .brand {
@@ -107,154 +97,102 @@ img {
   width: 36px;
   height: 36px;
   margin: -6px;
-  background: var(--color-accent);
+  background: var(--dot);
   clip-path: circle(12px at 50% 50%);
 }
 
-.hero {
-  margin-top: 228px;
+/* ---------- Intro copy ---------- */
+
+.copy {
+  position: absolute;
+  left: var(--copy-x);
+  top: 43.35%;
+  z-index: 3;
+  width: min(var(--copy-w), 34vw);
 }
 
-.hero-title {
-  max-width: 495px;
+.copy h1 {
+  max-width: 407px;
   font-size: 24px;
   font-weight: 500;
+  line-height: normal;
 }
 
-.hero-body {
-  max-width: 597px;
-  margin-top: 32px;
-  line-height: 22px;
-}
-
-/* Slow blur-to-focus intro: title and body arrive together at 300ms */
-.hero-title,
-.hero-body {
-  animation: focus-in 2.8s var(--ease-slow) 300ms both;
-}
-
-@keyframes focus-in {
-  from {
-    opacity: 0;
-    filter: blur(28px);
-    transform: translateY(12px) scale(1.02);
-  }
-  to {
-    opacity: 1;
-    filter: blur(0);
-    transform: none;
-  }
-}
-
-/* ---------- Paper section ---------- */
-
-.paper {
-  padding: 72px 0 149px;
-}
-
-.section-label {
-  font-size: 16px;
-}
-
-/* Scroll reveal — Experience entries fade up one line at a time */
-.js .reveal {
-  opacity: 0;
-  transform: translateY(28px);
-  filter: blur(4px);
-  transition:
-    opacity 0.9s var(--ease-out),
-    transform 0.9s var(--ease-out),
-    filter 0.9s var(--ease-out);
-}
-
-.js .reveal.is-visible {
-  opacity: 1;
-  transform: none;
-  filter: blur(0);
-}
-
-/* ---------- Experience ---------- */
-
-.job-list {
-  display: flex;
-  flex-direction: column;
-  gap: 48px;
-  margin-top: 22px;
-}
-
-.job {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.divider {
-  display: block;
-  width: 100%;
-  height: 1px;
-}
-
-.job-row {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 24px;
-}
-
-.job-meta {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  min-width: 0;
-}
-
-.job-company {
-  font-size: 18px;
-  font-weight: 500;
-  letter-spacing: -0.36px;
-}
-
-.job-role {
-  font-size: 16px;
-}
-
-.job-desc {
-  flex: 0 0 377px;
-  color: var(--color-body);
+.copy p {
+  margin-top: 24px;
   font-size: 14px;
+  line-height: 20px;
 }
 
-/* ---------- Select works ---------- */
-
-.select-works {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 9px;
-  width: min(1027px, 100% - var(--gutter) * 2);
-  margin: 142px auto 0;
-  padding: 40px 24px;
-  border-radius: 16px;
-  background: var(--color-card);
-  text-align: center;
+.copy p + p {
+  margin-top: 20px;
 }
 
-.works-title {
-  font-size: 30px;
-  font-weight: 500;
-  letter-spacing: -0.6px;
+.copy .aside {
+  font-style: italic;
 }
 
-.works-status {
-  font-family: var(--font-arial);
-  font-size: 16px;
-  letter-spacing: -0.32px;
+.marked {
+  text-decoration: underline;
+  text-decoration-skip-ink: none;
+  text-underline-position: from-font;
+}
+
+a.marked {
+  transition: opacity 0.2s ease;
+}
+
+a.marked:hover {
+  opacity: 0.6;
+}
+
+/* ---------- Clock ---------- */
+
+.clock {
+  position: absolute;
+  top: calc(var(--ap-y) + var(--ap-h) + 7px);
+  right: calc(100% - var(--ap-x) - var(--ap-w));
+  z-index: 3;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  line-height: 22px;
+  white-space: nowrap;
 }
 
 /* ---------- Footer ---------- */
 
+/* Pinned to the bottom of the window, so the contact details are always
+   there. It takes the room's color, at enough transparency that the glow
+   still reads through it when anything scrolls underneath. */
 .site-footer {
-  padding: 18px 0;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 12px 10px 24px;
+  z-index: 4;
+  background: var(--room);
+  background: color-mix(in srgb, var(--room) 86%, transparent);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  transition: background-color var(--sky-fade) linear;
+}
+
+.footer-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  width: 89.3%;
+  margin-inline: auto;
+  font-size: 12px;
+}
+
+.footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 24px;
 }
 
 .site-footer a {
@@ -265,103 +203,65 @@ img {
   opacity: 0.6;
 }
 
-.footer-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 24px;
-}
-
-.footer-links {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px 24px;
-}
-
 .footer-email {
   text-decoration: underline;
   text-underline-position: from-font;
 }
 
-/* ---------- Responsive ---------- */
+/* ---------- Responsive ----------
+   Phase 4 is the real mobile pass; this keeps the page sound until then. */
 
-@media (max-width: 900px) {
-  .job-desc {
-    flex-basis: 45%;
-  }
-}
-
-@media (max-width: 720px) {
-  :root {
-    --gutter: 24px;
-  }
-
-  .masthead {
-    padding: 32px 0 120px;
-  }
-
-  .hero {
-    margin-top: 120px;
-  }
-
-  .paper {
-    padding: 72px 0 72px;
-  }
-
-  .job-list {
-    gap: 36px;
-  }
-
-  .job-row {
+@media (max-width: 820px) {
+  .page {
+    display: flex;
     flex-direction: column;
-    gap: 12px;
+    height: auto;
+    min-height: 100vh;
+    /* Room for the pinned footer. */
+    padding: 76px 24px 96px;
   }
 
-  .job-desc {
-    flex-basis: auto;
+  .site-nav {
+    top: 20px;
+    left: 24px;
   }
 
-  .select-works {
-    margin-top: 96px;
+  /* Keep the Figma reading order once these join the flow: sky, clock, copy. */
+  .sky-aperture {
+    order: 1;
+  }
+
+  .clock {
+    order: 2;
+    position: static;
+    margin-top: 7px;
+    text-align: right;
+  }
+
+  .copy {
+    order: 3;
+    position: static;
+    width: auto;
+    max-width: 480px;
+    margin-top: 28px;
+  }
+
+  .copy h1 {
+    max-width: none;
   }
 
   .site-footer {
-    padding: 14px 0;
-    font-size: 14px;
+    padding: 14px 24px 24px;
   }
 
-  .footer-row,
-  .footer-links {
-    gap: 12px;
-  }
-
-  .footer-links {
-    flex-wrap: nowrap;
-  }
-}
-
-@media (max-width: 359px) {
-  .footer-links {
-    flex-wrap: wrap;
-    gap: 4px 12px;
+  .footer-row {
+    width: 100%;
+    gap: 16px;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
-  }
-
-  .hero-title,
-  .hero-body {
-    animation: none;
-  }
-
-  .js .reveal {
-    opacity: 1;
-    transform: none;
-    filter: none;
+  body {
     transition: none;
   }
 }
