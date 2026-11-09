@@ -161,13 +161,21 @@ a.marked:hover {
 
 /* ---------- Footer ---------- */
 
+/* Pinned to the bottom of the window, so the contact details are always
+   there. It takes the room's color, at enough transparency that the glow
+   still reads through it when anything scrolls underneath. */
 .site-footer {
-  position: absolute;
+  position: fixed;
   bottom: 0;
   left: 0;
   width: 100%;
   padding: 12px 10px 24px;
-  z-index: 3;
+  z-index: 4;
+  background: var(--room);
+  background: color-mix(in srgb, var(--room) 86%, transparent);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  transition: background-color var(--sky-fade) linear;
 }
 
 .footer-row {
@@ -209,7 +217,8 @@ a.marked:hover {
     flex-direction: column;
     height: auto;
     min-height: 100vh;
-    padding: 76px 24px 0;
+    /* Room for the pinned footer. */
+    padding: 76px 24px 96px;
   }
 
   .site-nav {
@@ -242,11 +251,7 @@ a.marked:hover {
   }
 
   .site-footer {
-    order: 4;
-    position: static;
-    width: auto;
-    margin: auto -24px 0;
-    padding: 48px 24px 24px;
+    padding: 14px 24px 24px;
   }
 
   .footer-row {
