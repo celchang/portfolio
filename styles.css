@@ -138,6 +138,14 @@ a:focus-visible {
   text-underline-position: from-font;
 }
 
+a.marked {
+  transition: opacity 0.2s ease;
+}
+
+a.marked:hover {
+  opacity: 0.6;
+}
+
 /* ---------- Clock ---------- */
 
 .clock {
