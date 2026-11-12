@@ -1,11 +1,12 @@
 // Paints the sky: reads the clock (and, from phase 2, the weather), works out
 // the colors, and writes them to the page as CSS variables.
 //
-// Phase 1: one render at load, with the weather fixed to clear. The minute
-// loop and cloud drift arrive in phase 3, live weather in phase 2.
+// Phase 2: the clear sky is drawn at once, then the live NYC conditions blend
+// in when they arrive. The minute loop and cloud drift arrive in phase 3.
 
 import { sunElevation, nycToday, nycTimeToDate, nycClockLabel } from './sun.js';
 import { loadPalette, computeSky, rgbToHex } from './palette.js';
+import { currentWeather } from './weather.js';
 
 const PALETTE_URL = new URL('./palette.json', import.meta.url);
 const WEATHER_LABELS = {
@@ -124,6 +125,7 @@ function paint(palette, moment, weather) {
   root.style.setProperty('--ink', rgbToHex(sky.ink));
   root.style.setProperty('--spill', sky.dark ? '0.35' : '0.55');
   root.dataset.skyspace = sky.dark ? 'dark' : 'light';
+  root.dataset.weather = weather;
 
   paintClouds(sky);
 
@@ -135,8 +137,6 @@ function paint(palette, moment, weather) {
 
 async function start() {
   const preview = readPreview();
-  // Phase 2 replaces this with the live Open-Meteo reading.
-  const weather = preview.weather || 'clear';
 
   let palette;
   try {
@@ -148,8 +148,27 @@ async function start() {
     return;
   }
 
-  paint(palette, momentFor(preview), weather);
+  const moment = momentFor(preview);
+
+  // The clear sky for this moment goes up straight away — never a blank page
+  // or a loading box while the weather is on its way.
+  paint(palette, moment, preview.weather || 'clear');
   document.body.classList.add('skyspace-ready');
+
+  // A forced state stays forced, and asks the network for nothing.
+  if (preview.weather) {
+    document.documentElement.dataset.weatherSource = 'preview';
+    return;
+  }
+
+  const reading = await currentWeather();
+  if (reading.error) {
+    console.warn('Skyspace: weather unavailable, staying on clear.', reading.error);
+  }
+
+  document.documentElement.dataset.weatherSource = reading.source;
+  // The CSS transitions carry it over from clear.
+  paint(palette, moment, reading.key);
 }
 
 start();

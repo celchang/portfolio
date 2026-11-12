@@ -162,8 +162,7 @@ a.marked:hover {
 /* ---------- Footer ---------- */
 
 /* Pinned to the bottom of the window, so the contact details are always
-   there. It takes the room's color, at enough transparency that the glow
-   still reads through it when anything scrolls underneath. */
+   there. No background of its own — it sits straight on the room. */
 .site-footer {
   position: fixed;
   bottom: 0;
@@ -171,11 +170,6 @@ a.marked:hover {
   width: 100%;
   padding: 12px 10px 24px;
   z-index: 4;
-  background: var(--room);
-  background: color-mix(in srgb, var(--room) 86%, transparent);
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
-  transition: background-color var(--sky-fade) linear;
 }
 
 .footer-row {
