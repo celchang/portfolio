@@ -244,8 +244,15 @@ a.marked:hover {
     max-width: none;
   }
 
+  /* On a phone the page scrolls under the pinned footer, so here it does
+     need a ground of its own: the room's color, tinted and blurred. */
   .site-footer {
     padding: 14px 24px 24px;
+    background: var(--room);
+    background: color-mix(in srgb, var(--room) 86%, transparent);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    transition: background-color var(--sky-fade) linear;
   }
 
   .footer-row {
