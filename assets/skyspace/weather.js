@@ -25,7 +25,14 @@ const FOG = (code) => code === 45 || code === 48;
 
 // Anything wet is rain; fog counts as overcast; otherwise the sky is judged
 // by how much cloud is in it, falling back to the code when cover is missing.
-export function mapWeather({ weatherCode, cloudCover } = {}) {
+//
+// Precipitation is checked before the code: Open-Meteo's current code can
+// still read "overcast" while light drizzle is falling, and if anything is
+// coming down the room should read as rain.
+export function mapWeather({ weatherCode, cloudCover, precipitation } = {}) {
+  const wet = Number(precipitation);
+  if (Number.isFinite(wet) && wet > 0) return 'rain';
+
   const code = Number(weatherCode);
 
   if (Number.isFinite(code)) {
@@ -74,7 +81,7 @@ export async function fetchWeather({
 } = {}) {
   const url =
     `${ENDPOINT}?latitude=${lat}&longitude=${lon}` +
-    `&current=weather_code,cloud_cover&timezone=America%2FNew_York`;
+    `&current=weather_code,cloud_cover,precipitation&timezone=America%2FNew_York`;
 
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
@@ -90,9 +97,11 @@ export async function fetchWeather({
       key: mapWeather({
         weatherCode: current.weather_code,
         cloudCover: current.cloud_cover,
+        precipitation: current.precipitation,
       }),
       weatherCode: current.weather_code,
       cloudCover: current.cloud_cover,
+      precipitation: current.precipitation,
       observedAt: current.time,
     };
   } finally {

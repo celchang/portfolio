@@ -18,6 +18,20 @@ test('snow reads as rain for now (build plan decision)', () => {
   }
 });
 
+test('anything falling reads as rain, whatever the code says', () => {
+  // Open-Meteo's current code can still read "overcast" while drizzle falls.
+  assert.equal(mapWeather({ weatherCode: 3, cloudCover: 100, precipitation: 0.4 }), 'rain');
+  assert.equal(mapWeather({ weatherCode: 0, cloudCover: 0, precipitation: 0.1 }), 'rain');
+});
+
+test('a dry reading is not forced to rain', () => {
+  assert.equal(mapWeather({ weatherCode: 3, cloudCover: 100, precipitation: 0 }), 'overcast');
+  assert.equal(mapWeather({ weatherCode: 1, cloudCover: 10, precipitation: 0 }), 'clear');
+  // A missing or unusable precipitation field must not swing the result.
+  assert.equal(mapWeather({ weatherCode: 3, cloudCover: 100, precipitation: null }), 'overcast');
+  assert.equal(mapWeather({ weatherCode: 3, cloudCover: 100, precipitation: 'n/a' }), 'overcast');
+});
+
 test('fog reads as overcast', () => {
   assert.equal(mapWeather({ weatherCode: 45, cloudCover: 0 }), 'overcast');
   assert.equal(mapWeather({ weatherCode: 48, cloudCover: 0 }), 'overcast');
@@ -43,12 +57,24 @@ test('falls back to the code when cloud cover is missing', () => {
 test('fetchWeather maps a real-shaped Open-Meteo payload', async () => {
   const fetchImpl = async () => ({
     ok: true,
-    json: async () => ({ current: { time: '2026-11-12T08:45', weather_code: 3, cloud_cover: 100 } }),
+    json: async () => ({
+      current: { time: '2026-11-12T08:45', weather_code: 3, cloud_cover: 100, precipitation: 0 },
+    }),
   });
   const reading = await fetchWeather({ fetchImpl });
   assert.equal(reading.key, 'overcast');
   assert.equal(reading.cloudCover, 100);
   assert.equal(reading.observedAt, '2026-11-12T08:45');
+});
+
+test('fetchWeather asks the API for precipitation', async () => {
+  let asked = '';
+  const fetchImpl = async (url) => {
+    asked = url;
+    return { ok: true, json: async () => ({ current: { weather_code: 0, cloud_cover: 0 } }) };
+  };
+  await fetchWeather({ fetchImpl });
+  assert.match(asked, /current=weather_code,cloud_cover,precipitation/);
 });
 
 test('fetchWeather rejects on a bad status', async () => {
