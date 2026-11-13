@@ -1,8 +1,10 @@
-// Paints the sky: reads the clock (and, from phase 2, the weather), works out
-// the colors, and writes them to the page as CSS variables.
+// Paints the sky: reads the clock and the weather, works out the colors, and
+// writes them to the page as CSS variables.
 //
-// Phase 2: the clear sky is drawn at once, then the live NYC conditions blend
-// in when they arrive. The minute loop and cloud drift arrive in phase 3.
+// Phase 3: the page opens straight on the current sky, then keeps itself up to
+// date every minute. The transition lasts as long as the gap between updates,
+// so the light is always drifting rather than stepping. Work pauses while the
+// tab is hidden and catches up in one slow move when it comes back.
 
 import { sunElevation, nycToday, nycTimeToDate, nycClockLabel } from './sun.js';
 import { loadPalette, computeSky, rgbToHex } from './palette.js';
@@ -16,8 +18,17 @@ const WEATHER_LABELS = {
   rain: 'Rain',
 };
 
+const TICK_MS = 60 * 1000; // one minute of real time
+const WEATHER_POLL_MS = 5 * 60 * 1000; // the reading itself is cached for 15
+const MIN_TICK_MS = 250; // floor, so a big ?speed= can't thrash the page
+// The light drifts over a whole minute, but a change in the weather should
+// arrive while you are still looking at it.
+const WEATHER_FADE_MS = 4000;
+
+const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
 // ---- preview mode (see the build plan's Testing section) -------------------
-// ?time=17:15 · ?date=2026-12-21 · ?weather=partly
+// ?time=17:15 · ?date=2026-12-21 · ?weather=partly · ?speed=60
 // These only ever affect the person who typed them into the URL.
 function readPreview(search = window.location.search) {
   const params = new URLSearchParams(search);
@@ -38,11 +49,14 @@ function readPreview(search = window.location.search) {
   const weather = params.get('weather');
   if (weather && weather in WEATHER_LABELS) preview.weather = weather;
 
+  const speed = Number(params.get('speed'));
+  if (Number.isFinite(speed) && speed > 1) preview.speed = Math.min(speed, 3600);
+
   return preview;
 }
 
-// The moment to draw: now, unless a preview asked for another one.
-function momentFor(preview, now = new Date()) {
+// The moment the clock starts from: now, unless a preview asked for another.
+function startingMoment(preview, now = new Date()) {
   if (!preview.time && !preview.date) return now;
 
   const day = preview.date || nycToday(now);
@@ -63,10 +77,26 @@ function momentFor(preview, now = new Date()) {
   return nycTimeToDate({ ...day, ...clock });
 }
 
+// ---- the clock this page runs on ------------------------------------------
+// Normally real time. With ?speed= it runs faster, measured from the moment
+// the page opened, so a sunset can be watched in about a minute.
+function makeClock(preview) {
+  const speed = preview.speed || 1;
+  const startedAt = Date.now();
+  const base = startingMoment(preview).getTime();
+
+  return {
+    speed,
+    tickMs: Math.max(MIN_TICK_MS, TICK_MS / speed),
+    now: () => new Date(base + (Date.now() - startedAt) * speed),
+  };
+}
+
 // ---- clouds ---------------------------------------------------------------
 // Low-frequency fractal noise, stretched sideways like a wind-blown cloud
 // field, used as a mask so the cloud color can follow the light. Each mask is
-// built once and cached; from phase 3 they are only moved, never redrawn.
+// built once and cached, and the drift is a CSS transform on top — the
+// textures are never redrawn, which keeps slow phones out of trouble.
 const maskCache = new Map();
 
 function cloudMask(kind, coverage, size) {
@@ -92,6 +122,8 @@ function cloudMask(kind, coverage, size) {
   return value;
 }
 
+let appliedMask = '';
+
 function paintClouds(sky) {
   const big = document.querySelector('.sky-cloud.is-big');
   const wisp = document.querySelector('.sky-cloud.is-wisp');
@@ -105,13 +137,25 @@ function paintClouds(sky) {
   }
 
   const size = Math.round(sky.size * 10) / 10;
-  big.style.webkitMaskImage = big.style.maskImage = cloudMask('big', coverage, size);
-  wisp.style.webkitMaskImage = wisp.style.maskImage = cloudMask('wisp', coverage, size);
+  const stamp = `${coverage}|${size}`;
+
+  // Only touch the masks when the shape of the cloud field actually changes,
+  // so a minute tick never interrupts the drift.
+  if (stamp !== appliedMask) {
+    big.style.webkitMaskImage = big.style.maskImage = cloudMask('big', coverage, size);
+    wisp.style.webkitMaskImage = wisp.style.maskImage = cloudMask('wisp', coverage, size);
+    appliedMask = stamp;
+  }
+
   big.style.opacity = Math.min(1, 0.55 + coverage * 0.45).toFixed(2);
   wisp.style.opacity = (sky.texture * (0.4 + coverage * 0.5)).toFixed(2);
 }
 
 // ---- paint ----------------------------------------------------------------
+function setFade(ms) {
+  document.documentElement.style.setProperty('--sky-fade', `${Math.round(ms)}ms`);
+}
+
 function paint(palette, moment, weather) {
   const elevation = sunElevation(moment);
   const sky = computeSky(palette, elevation, weather);
@@ -135,6 +179,7 @@ function paint(palette, moment, weather) {
   }
 }
 
+// ---- the loop -------------------------------------------------------------
 async function start() {
   const preview = readPreview();
 
@@ -148,27 +193,72 @@ async function start() {
     return;
   }
 
-  const moment = momentFor(preview);
+  const clock = makeClock(preview);
+  // Colors still change when motion is reduced; they just don't animate.
+  const fadeMs = () => (reducedMotion.matches ? 0 : clock.tickMs);
+  let weather = preview.weather || 'clear';
+  let timer = null;
 
-  // The clear sky for this moment goes up straight away — never a blank page
-  // or a loading box while the weather is on its way.
-  paint(palette, moment, preview.weather || 'clear');
+  // The page opens straight on the current sky: no arrival sequence, no
+  // loading box, nothing to sit through.
+  setFade(0);
+  paint(palette, clock.now(), weather);
   document.body.classList.add('skyspace-ready');
 
-  // A forced state stays forced, and asks the network for nothing.
+  // Commit those colors with the transition still at zero, so the sky is
+  // simply there rather than fading up from the stylesheet's defaults. Reading
+  // a layout property forces that synchronously — waiting for a frame or a
+  // timer would be too late in a tab that isn't drawing.
+  void document.documentElement.offsetHeight;
+  setFade(fadeMs());
+
+  const tick = (fade = fadeMs()) => {
+    if (document.hidden) return;
+    setFade(fade);
+    paint(palette, clock.now(), weather);
+  };
+
+  const startTicking = () => {
+    if (timer) clearInterval(timer);
+    timer = setInterval(tick, clock.tickMs);
+  };
+
+  // A forced ?weather= state stays forced, and asks the network for nothing.
   if (preview.weather) {
     document.documentElement.dataset.weatherSource = 'preview';
-    return;
+  } else {
+    const refreshWeather = async () => {
+      if (document.hidden) return;
+      const reading = await currentWeather();
+      if (reading.error) {
+        console.warn('Skyspace: weather unavailable, staying on clear.', reading.error);
+      }
+      document.documentElement.dataset.weatherSource = reading.source;
+      if (reading.key !== weather) {
+        weather = reading.key;
+        // Blend into the new state now, over a few seconds, rather than
+        // waiting out the minute drift.
+        tick(reducedMotion.matches ? 0 : Math.min(WEATHER_FADE_MS, clock.tickMs));
+      }
+    };
+
+    refreshWeather();
+    setInterval(refreshWeather, WEATHER_POLL_MS);
   }
 
-  const reading = await currentWeather();
-  if (reading.error) {
-    console.warn('Skyspace: weather unavailable, staying on clear.', reading.error);
-  }
+  startTicking();
 
-  document.documentElement.dataset.weatherSource = reading.source;
-  // The CSS transitions carry it over from clear.
-  paint(palette, moment, reading.key);
+  // Nothing runs while the tab is in the background; coming back catches up
+  // in one slow move.
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      clearInterval(timer);
+      timer = null;
+      return;
+    }
+    tick();
+    startTicking();
+  });
 }
 
 start();
