@@ -103,12 +103,33 @@ a:focus-visible {
 
 /* ---------- Intro copy ---------- */
 
-.copy {
+/* The middle band: intro text on the left, the disc in the right column.
+   The band's top is the text's top (from the Figma frame) and its height is
+   the text's height, so centring the disc against it puts the disc on the
+   text block's centre line without the text moving at all. */
+.band {
   position: absolute;
-  left: var(--copy-x);
+  left: 0;
   top: 43.35%;
   z-index: 3;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding-left: var(--copy-x);
+  padding-right: var(--edge);
+}
+
+.copy {
+  order: 1;
+  flex: none;
   width: min(var(--copy-w), 34vw);
+}
+
+.sky {
+  order: 2;
+  flex: 1;
+  display: flex;
+  justify-content: center;
 }
 
 .copy h1 {
@@ -148,10 +169,13 @@ a.marked:hover {
 
 /* ---------- Clock ---------- */
 
+/* Centred under the disc, 16px below it. Absolutely positioned, so the label
+   changing length never nudges anything. */
 .clock {
   position: absolute;
-  top: calc(var(--ap-y) + var(--ap-h) + 7px);
-  right: calc(100% - var(--ap-x) - var(--ap-w));
+  top: calc(100% + 16px);
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 3;
   font-family: var(--font-mono);
   font-size: 10px;
@@ -220,21 +244,25 @@ a.marked:hover {
     left: 24px;
   }
 
-  /* Keep the Figma reading order once these join the flow: sky, clock, copy. */
-  .sky-aperture {
-    order: 1;
+  /* Stacked: the disc above the headline, left-aligned with the text. */
+  .band {
+    position: static;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+    padding: 0;
   }
 
-  .clock {
-    order: 2;
-    position: static;
-    margin-top: 7px;
-    text-align: right;
+  .sky {
+    order: 1;
+    flex: none;
+    justify-content: flex-start;
+    /* Clears the clock, which hangs below the disc on its own layer. */
+    margin-bottom: 54px;
   }
 
   .copy {
-    order: 3;
-    position: static;
+    order: 2;
     width: auto;
     max-width: 480px;
     margin-top: 28px;

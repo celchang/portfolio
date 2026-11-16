@@ -24,6 +24,9 @@ const MIN_TICK_MS = 250; // floor, so a big ?speed= can't thrash the page
 // The light drifts over a whole minute, but a change in the weather should
 // arrive while you are still looking at it.
 const WEATHER_FADE_MS = 4000;
+// How much bigger the cloud forms are drawn, relative to the palette's size,
+// now that the opening is a small disc rather than a tall rectangle.
+const CLOUD_SHAPE_SCALE = 1.8;
 
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
@@ -136,7 +139,11 @@ function paintClouds(sky) {
     return;
   }
 
-  const size = Math.round(sky.size * 10) / 10;
+  // The palette's cloud size is tuned for a large opening. On a small disc the
+  // same frequency would read as a scatter of specks, so the forms are
+  // enlarged relative to it — a few soft shapes across the circle. This scales
+  // the mask only; no palette value is touched.
+  const size = Math.round(sky.size * CLOUD_SHAPE_SCALE * 10) / 10;
   const stamp = `${coverage}|${size}`;
 
   // Only touch the masks when the shape of the cloud field actually changes,
