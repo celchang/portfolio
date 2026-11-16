@@ -12,48 +12,69 @@
   --spill: 0.55;
   --dot: #f3787a;
 
-  /* Aperture box, as a share of the page — from the Figma frame:
-     479 × 637 at (761, 84) in a 1440 × 828 frame. */
-  --ap-x: 52.85%;
-  --ap-y: 10.15%;
-  --ap-w: 33.26%;
-  --ap-h: 76.95%;
+  /* The disc, from the Figma desktop frame (Desktop - 9, 1440 × 828):
+     709px across at (806, 159), so it runs off the right and bottom edges.
+     Kept proportional to the viewport so it bleeds the same way at any size.
+     Its size drives everything else here — halo, grain, the blur on the
+     cloud layers — so the piece scales as one thing. */
+  --ap-size: 49.24vw;
+  --disc-left: 55.97vw;
+  --disc-top: 19.2vh;
+  /* A rim of light rather than a wide halo: at this diameter anything more
+     would wash across the whole page. */
+  --halo-scale: 1.12;
+  --halo-blur: 0.04;
+  /* Clock, sitting just above the disc (Figma: 13px over the rim). */
+  --clock-left: 44.4%;
+  --clock-gap: 13px;
 
   --sky-fade: 1.2s;
 }
 
-/* The light from the aperture falling on the page. */
-.sky-spill {
+/* The disc sits where the Figma frame puts it and is allowed to run off the
+   page; .page clips it. Sized in CSS alone, so the space is settled before
+   anything paints and nothing shifts on load. */
+.sky {
   position: absolute;
-  inset: 0;
+  left: var(--disc-left);
+  top: var(--disc-top);
   z-index: 1;
   pointer-events: none;
-  opacity: var(--spill);
-  transition: opacity 0.8s linear;
 }
 
-.sky-spill::before {
-  content: "";
+.sky-figure {
+  position: relative;
+  width: var(--ap-size);
+  height: var(--ap-size);
+}
+
+/* The light from the opening falling on the page: a halo 1.6× the disc,
+   centred on it. A radial fade rather than a blurred solid, so its reach is
+   bounded by its own box and it can't creep across into the text column. */
+.sky-spill {
   position: absolute;
-  left: var(--ap-x);
-  top: var(--ap-y);
-  width: var(--ap-w);
-  height: var(--ap-h);
-  background: var(--glow);
-  transform: scale(1.55);
-  filter: blur(70px);
-  transition: background-color var(--sky-fade) linear;
+  left: 50%;
+  top: 50%;
+  width: calc(var(--ap-size) * var(--halo-scale));
+  height: calc(var(--ap-size) * var(--halo-scale));
+  transform: translate(-50%, -50%);
+  z-index: 1;
+  pointer-events: none;
+  border-radius: 50%;
+  background: radial-gradient(circle closest-side, var(--glow), transparent 72%);
+  filter: blur(calc(var(--ap-size) * var(--halo-blur)));
+  opacity: var(--spill);
+  transition: opacity 0.8s linear, background-color var(--sky-fade) linear;
 }
 
-/* The opening itself: a knife-edge rectangle, no frame, no shadow. */
+/* The opening itself: a knife-edge disc of sky set into the page. No border,
+   no shadow, no inner depth. */
 .sky-aperture {
   position: absolute;
-  left: var(--ap-x);
-  top: var(--ap-y);
-  width: var(--ap-w);
-  height: var(--ap-h);
+  inset: 0;
   z-index: 2;
   overflow: hidden;
+  border-radius: 50%;
   background: linear-gradient(180deg, var(--sky-top), var(--sky-bot));
   transition: background var(--sky-fade) linear;
 }
@@ -70,8 +91,35 @@
   transition: opacity var(--sky-fade) linear, background-color var(--sky-fade) linear;
 }
 
+/* The drift is a transform on the finished texture — the masks are drawn
+   once and only moved, never redrawn. Two layers at different speeds, so
+   the field never reads as one sheet sliding past. The blur scales with the
+   disc so the forms stay equally soft at any size. */
 .sky-cloud.is-big {
-  filter: blur(5px);
+  filter: blur(calc(var(--ap-size) * 0.022));
+  animation: cloud-drift-big 140s linear infinite alternate;
+}
+
+.sky-cloud.is-wisp {
+  animation: cloud-drift-wisp 80s linear infinite alternate;
+}
+
+@keyframes cloud-drift-big {
+  from {
+    transform: translate(-6%, -1%);
+  }
+  to {
+    transform: translate(6%, 1.5%);
+  }
+}
+
+@keyframes cloud-drift-wisp {
+  from {
+    transform: translate(5%, 1%);
+  }
+  to {
+    transform: translate(-7%, -1%);
+  }
 }
 
 .sky-grain {
@@ -83,29 +131,28 @@
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
 }
 
+/* No drift and no fading for anyone who asked for less motion. The colors
+   still change with the hour; they just arrive without animating. */
 @media (prefers-reduced-motion: reduce) {
   .sky-spill,
   .sky-aperture,
   .sky-cloud {
     transition: none;
   }
+
+  .sky-cloud {
+    animation: none;
+  }
 }
 
-/* Phase 4 refines the phone layout; this keeps it sound in the meantime.
-   The aperture joins the flow, and the spill keeps roughly its box. */
+/* From the Figma mobile frame (iPhone 16 - 1, 393 × 852): 431px across at
+   (64, 576), below the text and running off the right and bottom edges. */
 @media (max-width: 820px) {
   :root {
-    --ap-x: 0%;
-    --ap-y: 9%;
-    --ap-w: 100%;
-    --ap-h: 42%;
-  }
-
-  .sky-aperture {
-    position: relative;
-    left: auto;
-    top: auto;
-    width: 100%;
-    height: min(46vh, 420px);
+    --ap-size: 109.67vw;
+    --disc-left: 16.28vw;
+    --disc-top: 67.6vh;
+    --clock-left: 41.07%;
+    --clock-gap: 7px;
   }
 }
