@@ -12,19 +12,38 @@
   --spill: 0.55;
   --dot: #f3787a;
 
-  /* The disc. Its size drives everything else here — halo, grain, the blur
-     on the cloud layers — so the piece scales as one thing. */
-  --ap-size: clamp(160px, 17vw, 260px);
-  --halo-scale: 1.6;
+  /* The disc, from the Figma desktop frame (Desktop - 9, 1440 × 828):
+     709px across at (806, 159), so it runs off the right and bottom edges.
+     Kept proportional to the viewport so it bleeds the same way at any size.
+     Its size drives everything else here — halo, grain, the blur on the
+     cloud layers — so the piece scales as one thing. */
+  --ap-size: 49.24vw;
+  --disc-left: 55.97vw;
+  --disc-top: 19.2vh;
+  /* A rim of light rather than a wide halo: at this diameter anything more
+     would wash across the whole page. */
+  --halo-scale: 1.12;
+  --halo-blur: 0.04;
+  /* Clock, sitting just above the disc (Figma: 13px over the rim). */
+  --clock-left: 44.4%;
+  --clock-gap: 13px;
 
   --sky-fade: 1.2s;
 }
 
-/* Holds the disc and the clock beneath it. Fixed size, so the space is
-   reserved before anything paints and the page never shifts. */
+/* The disc sits where the Figma frame puts it and is allowed to run off the
+   page; .page clips it. Sized in CSS alone, so the space is settled before
+   anything paints and nothing shifts on load. */
+.sky {
+  position: absolute;
+  left: var(--disc-left);
+  top: var(--disc-top);
+  z-index: 1;
+  pointer-events: none;
+}
+
 .sky-figure {
   position: relative;
-  flex: none;
   width: var(--ap-size);
   height: var(--ap-size);
 }
@@ -43,7 +62,7 @@
   pointer-events: none;
   border-radius: 50%;
   background: radial-gradient(circle closest-side, var(--glow), transparent 72%);
-  filter: blur(calc(var(--ap-size) * 0.1));
+  filter: blur(calc(var(--ap-size) * var(--halo-blur)));
   opacity: var(--spill);
   transition: opacity 0.8s linear, background-color var(--sky-fade) linear;
 }
@@ -126,8 +145,14 @@
   }
 }
 
+/* From the Figma mobile frame (iPhone 16 - 1, 393 × 852): 431px across at
+   (64, 576), below the text and running off the right and bottom edges. */
 @media (max-width: 820px) {
   :root {
-    --ap-size: 140px;
+    --ap-size: 109.67vw;
+    --disc-left: 16.28vw;
+    --disc-top: 67.6vh;
+    --clock-left: 41.07%;
+    --clock-gap: 7px;
   }
 }

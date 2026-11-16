@@ -103,33 +103,12 @@ a:focus-visible {
 
 /* ---------- Intro copy ---------- */
 
-/* The middle band: intro text on the left, the disc in the right column.
-   The band's top is the text's top (from the Figma frame) and its height is
-   the text's height, so centring the disc against it puts the disc on the
-   text block's centre line without the text moving at all. */
-.band {
+.copy {
   position: absolute;
-  left: 0;
+  left: var(--copy-x);
   top: 43.35%;
   z-index: 3;
-  display: flex;
-  align-items: center;
-  width: 100%;
-  padding-left: var(--copy-x);
-  padding-right: var(--edge);
-}
-
-.copy {
-  order: 1;
-  flex: none;
   width: min(var(--copy-w), 34vw);
-}
-
-.sky {
-  order: 2;
-  flex: 1;
-  display: flex;
-  justify-content: center;
 }
 
 .copy h1 {
@@ -169,13 +148,12 @@ a.marked:hover {
 
 /* ---------- Clock ---------- */
 
-/* Centred under the disc, 16px below it. Absolutely positioned, so the label
-   changing length never nudges anything. */
+/* Just above the disc, set in from its left edge, as in the Figma frames.
+   Absolutely positioned, so the label changing length never nudges anything. */
 .clock {
   position: absolute;
-  top: calc(100% + 16px);
-  left: 50%;
-  transform: translateX(-50%);
+  bottom: calc(100% + var(--clock-gap));
+  left: var(--clock-left);
   z-index: 3;
   font-family: var(--font-mono);
   font-size: 10px;
@@ -244,28 +222,21 @@ a.marked:hover {
     left: 24px;
   }
 
-  /* Stacked: the disc above the headline, left-aligned with the text. */
-  .band {
-    position: static;
-    flex-direction: column;
-    align-items: flex-start;
-    width: 100%;
-    padding: 0;
+  /* The disc runs off the right edge, so a left-anchored label would be cut
+     off on the longer conditions ("Partly cloudy"). Pinning its right edge to
+     the Figma position instead lets it grow leftwards and stay whole. */
+  .clock {
+    left: auto;
+    right: calc(25.95vw + 61px);
+    text-align: right;
   }
 
-  .sky {
-    order: 1;
-    flex: none;
-    justify-content: flex-start;
-    /* Clears the clock, which hangs below the disc on its own layer. */
-    margin-bottom: 54px;
-  }
-
+  /* The text runs down the page; the disc sits below it, placed by the
+     Figma mobile frame and clipped at the edges. */
   .copy {
-    order: 2;
+    position: static;
     width: auto;
     max-width: 480px;
-    margin-top: 28px;
   }
 
   .copy h1 {
