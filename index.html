@@ -16,6 +16,10 @@
 
   <link rel="stylesheet" href="assets/skyspace/skyspace.css">
   <link rel="stylesheet" href="styles.css">
+
+  <!-- Set before first paint: the reveals only hide themselves when there is
+       script around to bring them back. -->
+  <script>document.documentElement.classList.add('js');</script>
 </head>
 <body>
   <div class="page">
@@ -27,7 +31,7 @@
     </header>
 
     <main class="content">
-      <section class="copy">
+      <section class="copy reveal">
         <h1>Hi, I’m Celine, a New York–based product designer.</h1>
         <p>I’ve spent over a decade designing consumer products at companies of every stage, including Wonder, Luminary, BuzzFeed and Compass. Before moving into tech, I spent several years building brands and digital experiences across industries at Co-op Brand Partners.</p>
         <p>I’m fascinated by the space between behavioral psychology and design: how a small nudge, a well-placed bit of friction or a simpler set of choices changes what people actually do. I believe function and simplicity almost always win, but there’s always room for delight in the details.</p>
@@ -48,10 +52,10 @@
       </div>
 
       <section class="experience">
-        <h2>Experience</h2>
+        <h2 class="reveal">Experience</h2>
 
         <ol class="roles">
-          <li class="role">
+          <li class="role reveal">
             <div class="role-id">
               <h3>Wonder</h3>
               <p class="role-meta">Director, Product Design · 2020–2026</p>
@@ -59,7 +63,7 @@
             <p class="role-note">0→1 product development, business-model pivots, and building a multi-product consumer ecosystem that achieved growth.</p>
           </li>
 
-          <li class="role">
+          <li class="role reveal">
             <div class="role-id">
               <h3>Blue Apron</h3>
               <p class="role-meta">Director, Product Design · 2025–2026</p>
@@ -67,7 +71,7 @@
             <p class="role-note">Replatforming and repositioning an established consumer product within Wonder.</p>
           </li>
 
-          <li class="role">
+          <li class="role reveal">
             <div class="role-id">
               <h3>Luminary</h3>
               <p class="role-meta">Head of Design · 2018–2020</p>
@@ -75,7 +79,7 @@
             <p class="role-note">Building a podcast subscription product from pre-launch to market.</p>
           </li>
 
-          <li class="role">
+          <li class="role reveal">
             <div class="role-id">
               <h3>Buzzfeed</h3>
               <p class="role-meta">Product Designer · 2017–2018</p>
@@ -83,7 +87,7 @@
             <p class="role-note">Designed across BuzzFeed’s app, creator, and video products.</p>
           </li>
 
-          <li class="role">
+          <li class="role reveal">
             <div class="role-id">
               <h3>Compass</h3>
               <p class="role-meta">Product Designer · 2015–2017</p>
@@ -91,7 +95,7 @@
             <p class="role-note">Designed across Compass’s consumer experience, including web, search, mobile, and growth.</p>
           </li>
 
-          <li class="role">
+          <li class="role reveal">
             <div class="role-id">
               <h3>Co-op Brand Partners</h3>
               <p class="role-meta">Associate Creative Director, Digital · 2011–2015</p>
