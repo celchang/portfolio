@@ -13,13 +13,15 @@
   --dot: #f3787a;
 
   /* The disc, from the Figma desktop frame (Desktop - 9, 1440 × 828):
-     709px across at (806, 159), so it runs off the right and bottom edges.
+     709px across at (806, 159), so it runs off the right edge. The page
+     scrolls now, so its top is measured in vw like the rest of the disc —
+     it holds its place on the page rather than following the window.
      Kept proportional to the viewport so it bleeds the same way at any size.
      Its size drives everything else here — halo, grain, the blur on the
      cloud layers — so the piece scales as one thing. */
   --ap-size: 49.24vw;
   --disc-left: 55.97vw;
-  --disc-top: 19.2vh;
+  --disc-top: 11.04vw;
   /* A rim of light rather than a wide halo: at this diameter anything more
      would wash across the whole page. */
   --halo-scale: 1.12;
@@ -38,7 +40,9 @@
   position: absolute;
   left: var(--disc-left);
   top: var(--disc-top);
-  z-index: 1;
+  /* Behind the text, which runs over it, but still in front of the room.
+     .content owns the stacking context this sits in. */
+  z-index: -1;
   pointer-events: none;
 }
 
@@ -75,6 +79,11 @@
   z-index: 2;
   overflow: hidden;
   border-radius: 50%;
+  /* Safari lets a blended child (the grain) paint past a rounded overflow
+     clip, which shows up as a faint square behind the disc. clip-path is
+     honoured in that case; the radius above stays for everything else. */
+  clip-path: circle(50% at 50% 50%);
+  isolation: isolate;
   background: linear-gradient(180deg, var(--sky-top), var(--sky-bot));
   transition: background var(--sky-fade) linear;
 }
@@ -125,6 +134,7 @@
 .sky-grain {
   position: absolute;
   inset: 0;
+  border-radius: 50%;
   opacity: 0.22;
   mix-blend-mode: overlay;
   pointer-events: none;
@@ -151,8 +161,20 @@
   :root {
     --ap-size: 109.67vw;
     --disc-left: 16.28vw;
-    --disc-top: 67.6vh;
     --clock-left: 41.07%;
     --clock-gap: 7px;
+    /* Figma: the Experience list starts 249px above the bottom of the disc. */
+    --disc-pull: -63.36vw;
+  }
+
+  /* On a phone the disc takes its turn in the column — below the text, with
+     the Experience list pulled back up over it. Keeping it in the flow means
+     the overlap survives however the text above it wraps. The page's 24px
+     gutter is already spent, so the Figma x is measured from there. */
+  .sky {
+    position: relative;
+    left: auto;
+    top: auto;
+    margin: 24px 0 var(--disc-pull) calc(var(--disc-left) - 24px);
   }
 }
