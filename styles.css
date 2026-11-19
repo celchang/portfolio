@@ -249,15 +249,15 @@ a:focus-visible {
    the head has run, so the page is readable if script never arrives. */
 .js .reveal {
   opacity: 0;
-  transform: translateY(10px);
+  transform: translateY(14px);
 }
 
 .js .reveal.is-in {
   opacity: 1;
   transform: none;
   transition:
-    opacity 0.9s cubic-bezier(0.22, 0.61, 0.24, 1) var(--reveal-delay, 0ms),
-    transform 0.9s cubic-bezier(0.22, 0.61, 0.24, 1) var(--reveal-delay, 0ms);
+    opacity 1.5s cubic-bezier(0.22, 0.61, 0.24, 1) var(--reveal-delay, 0ms),
+    transform 1.5s cubic-bezier(0.22, 0.61, 0.24, 1) var(--reveal-delay, 0ms);
 }
 
 /* ---------- Mobile (Figma: iPhone 16 - 2, 393 wide) ---------- */

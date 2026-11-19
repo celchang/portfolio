@@ -19,7 +19,7 @@ if (intro) {
   // synchronously — a frame or a timer can be too late in a tab that is not
   // drawing yet.
   void intro.offsetHeight;
-  show(intro, reducedMotion.matches ? 0 : 160);
+  show(intro, reducedMotion.matches ? 0 : 250);
 }
 
 const blocks = document.querySelectorAll('.experience .reveal');
@@ -49,7 +49,7 @@ if (blocks.length) {
           // Top of the page first, so a batch arriving together reads downward.
           .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)
           .forEach((entry, i) => {
-            show(entry.target, i * 90);
+            show(entry.target, i * 150);
             observer.unobserve(entry.target);
           });
       },
